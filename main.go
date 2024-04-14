@@ -29,11 +29,20 @@ func main() {
 		cmdName := words[0]
 		cmd, exists := getCommands()[cmdName]
 		if exists {
-			err := cmd.callback(cfg)
-			if err != nil {
-				fmt.Println(err)
+			if len(words) > 1 {
+				err := cmd.callback(cfg, &words[1])
+				if err != nil {
+					fmt.Println(err)
+				}
+				continue
+			} else {
+				name := ""
+				err := cmd.callback(cfg, &name)
+				if err != nil {
+					fmt.Println(err)
+				}
+				continue
 			}
-			continue
 		} else {
 			fmt.Println("Unknown Command")
 			continue
@@ -44,7 +53,7 @@ func main() {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, *string) error
 }
 
 type config struct {
@@ -74,6 +83,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "get previous 20 locations",
 			callback:    CommandMapbwd,
+		},
+		"explore": {
+			name:        "explore",
+			description: "explore a certain region by name or number",
+			callback:    ExploreLocation,
 		},
 	}
 }

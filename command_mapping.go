@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func CommandMapfwd(cfg *config) error {
+func CommandMapfwd(cfg *config, name *string) error {
 	locResp, err := cfg.PokeClient.GetLocations(cfg.Next)
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func CommandMapfwd(cfg *config) error {
 	return nil
 }
 
-func CommandMapbwd(cfg *config) error {
+func CommandMapbwd(cfg *config, name *string) error {
 	if cfg.Previous == nil {
 		return errors.New("you are on the first page")
 	}
