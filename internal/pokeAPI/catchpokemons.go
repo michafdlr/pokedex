@@ -13,6 +13,9 @@ func (c *Client) CatchPokemon(name *string) (PokemonInfo, error) {
 	if name == nil {
 		return PokemonInfo{}, errors.New("no pokemon name provided")
 	}
+	if _, ok := c.pokedex[*name]; ok {
+		return PokemonInfo{}, errors.New("pokemon already caught")
+	}
 	url := baseURL + "/pokemon/" + *name
 	if val, ok := c.cache.Get(url); ok {
 		Pokemons := PokemonInfo{}
@@ -36,14 +39,15 @@ func (c *Client) CatchPokemon(name *string) (PokemonInfo, error) {
 		return PokemonInfo{}, err
 	}
 	Pokemons := PokemonInfo{}
-	randNum := rand.Intn(101)
-	if randNum < 50 {
-		return PokemonInfo{}, fmt.Errorf("could not catch %s", *name)
-	}
 	err = json.Unmarshal(body, &Pokemons)
 	if err != nil {
 		return PokemonInfo{}, err
 	}
+	randNum := rand.Intn(101)
+	if randNum < Pokemons.BaseExperience {
+		return PokemonInfo{}, fmt.Errorf("could not catch %s", *name)
+	}
 	c.cache.Add(url, body)
+	c.pokedex[*name] = Pokemons
 	return Pokemons, nil
 }
